@@ -12,6 +12,7 @@
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>Global|PythonCore|3.13</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -19,7 +20,13 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="LICENSE.txt" />
+    <Content Include="PROJECT_SUMMARY.md" />
+    <Content Include="README.md" />
     <Content Include="requirements.txt" />
+    <Content Include="Screenshot 2025-12-03 070440.png" />
+    <Content Include="Screenshot 2025-12-03 070456.png" />
+    <Content Include="USER_GUIDE.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BalrogNPC.py" />

@@ -28,6 +28,101 @@ except ImportError as e:
     _RATHENA_TOOLS_AVAILABLE = False
     print(f"[WARNING] rAthena Tools not available: {e}")
 
+# Monkeypatch Toplevel used across modules so new dialogs open centered
+try:
+    import tkinter as _tk
+
+    _orig_toplevel = _tk.Toplevel
+    _orig_init = _orig_toplevel.__init__
+
+    def _center_later(win):
+        try:
+            win._center_attempts = getattr(win, '_center_attempts', 0) + 1
+            win.update_idletasks()
+
+            # prefer actual size, fallback to geometry or requested size
+            w = win.winfo_width()
+            h = win.winfo_height()
+            if w <= 1 or h <= 1:
+                try:
+                    geom = win.geometry()
+                    size = geom.split('+')[0]
+                    w, h = map(int, size.split('x'))
+                except Exception:
+                    w = win.winfo_reqwidth() or 300
+                    h = win.winfo_reqheight() or 150
+
+            # if still too small, retry shortly (allow layout to settle)
+            if (w <= 50 or h <= 30) and win._center_attempts < 8:
+                try:
+                    win.after(60, lambda: _center_later(win))
+                    return
+                except Exception:
+                    pass
+
+            parent = getattr(win, 'master', None)
+            if parent:
+                try:
+                    rx = parent.winfo_rootx()
+                    ry = parent.winfo_rooty()
+                    rw = parent.winfo_width()
+                    rh = parent.winfo_height()
+                    x = rx + max((rw - w) // 2, 0)
+                    y = ry + max((rh - h) // 2, 0)
+                except Exception:
+                    sw = win.winfo_screenwidth()
+                    sh = win.winfo_screenheight()
+                    x = max((sw - w) // 2, 0)
+                    y = max((sh - h) // 2, 0)
+            else:
+                sw = win.winfo_screenwidth()
+                sh = win.winfo_screenheight()
+                x = max((sw - w) // 2, 0)
+                y = max((sh - h) // 2, 0)
+
+            # Clamp to screen bounds
+            sw = win.winfo_screenwidth()
+            sh = win.winfo_screenheight()
+            if x + w > sw:
+                x = max(sw - w, 0)
+            if y + h > sh:
+                y = max(sh - h, 0)
+
+            # Apply geometry
+            win.geometry(f"{w}x{h}+{x}+{y}")
+        except Exception:
+            pass
+
+    def _wrapped_init(self, *args, **kwargs):
+        # call original initializer (preserves class identity and super() behavior)
+        _orig_init(self, *args, **kwargs)
+
+        # schedule centering once layout has a chance to settle, and center on map
+        try:
+            self._center_attempts = 0
+            def _on_map(event):
+                try:
+                    self.unbind('<Map>', _map_id)
+                except Exception:
+                    pass
+                try:
+                    _center_later(self)
+                except Exception:
+                    pass
+
+            self.after_idle(lambda: _center_later(self))
+            _map_id = self.bind('<Map>', _on_map)
+        except Exception:
+            try:
+                _center_later(self)
+            except Exception:
+                pass
+
+    # Replace the initializer only (keeps Toplevel class identity)
+    _orig_toplevel.__init__ = _wrapped_init
+except Exception:
+    pass
+
 
 class BalrogNPC:
     """Simple text editor with rAthena Tools integration"""
@@ -149,6 +244,60 @@ class BalrogNPC:
             # Update line numbers when content changes
             try:
                 self._update_line_numbers()
+            except Exception:
+                pass
+
+    def center_window(self, win):
+        """Center a Toplevel window on the application root (or screen)."""
+        try:
+            self.root.update_idletasks()
+            win.update_idletasks()
+
+            # Window size
+            try:
+                w = win.winfo_width()
+                h = win.winfo_height()
+                if w <= 1 or h <= 1:
+                    # Try parsing geometry if not yet laid out
+                    geom = win.geometry()
+                    size = geom.split('+')[0]
+                    w, h = map(int, size.split('x'))
+            except Exception:
+                w = win.winfo_reqwidth()
+                h = win.winfo_reqheight()
+
+            # Parent/root position and size
+            try:
+                rx = self.root.winfo_rootx()
+                ry = self.root.winfo_rooty()
+                rw = self.root.winfo_width()
+                rh = self.root.winfo_height()
+            except Exception:
+                rx = ry = 0
+                rw = self.root.winfo_screenwidth()
+                rh = self.root.winfo_screenheight()
+
+            if rw > 1 and rh > 1:
+                x = rx + max((rw - w) // 2, 0)
+                y = ry + max((rh - h) // 2, 0)
+            else:
+                sw = self.root.winfo_screenwidth()
+                sh = self.root.winfo_screenheight()
+                x = max((sw - w) // 2, 0)
+                y = max((sh - h) // 2, 0)
+
+            win.geometry(f"{w}x{h}+{x}+{y}")
+        except Exception:
+            try:
+                # Best effort fallback: center on screen
+                sw = self.root.winfo_screenwidth()
+                sh = self.root.winfo_screenheight()
+                win.update_idletasks()
+                w = win.winfo_width()
+                h = win.winfo_height()
+                x = max((sw - w) // 2, 0)
+                y = max((sh - h) // 2, 0)
+                win.geometry(f"{w}x{h}+{x}+{y}")
             except Exception:
                 pass
     
@@ -476,6 +625,11 @@ class BalrogNPC:
         replace_entry.bind('<Return>', lambda e: replace_next())
 
         find_entry.focus()
+        # Ensure dialog is centered relative to main window
+        try:
+            self.center_window(dlg)
+        except Exception:
+            pass
         dlg.wait_window()
 
     def _update_line_numbers(self):
