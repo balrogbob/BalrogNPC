@@ -31,31 +31,87 @@ class SyntaxHighlighter:
                 continue
             path = os.path.join(self.syntax_dir, fn)
             try:
-                cfg = configparser.RawConfigParser()
-                cfg.optionxform = lambda s: s  # preserve case of keys
-                cfg.read(path, encoding='utf-8')
-                if 'Syntax' not in cfg:
-                    continue
-                sec = cfg['Syntax']
-                name = sec.get('name', os.path.splitext(fn)[0])
-                # collect detect extensions (if any)
-                exts_raw = sec.get('detect.ext', '')
-                exts = [e.strip().lstrip('.') for e in re.split('[,;]', exts_raw) if e.strip()]
-
-                # collect regex.* entries preserving order
+                # Prefer a line-based parser for the [Syntax] section to preserve
+                # complex regex RHS exactly as written in the INI file.
                 regexes = []
                 tags = {}
-                for k, v in sec.items():
-                    if k.startswith('regex.') and k.endswith('_RE'):
-                        token = k[len('regex.'): -len('_RE')]
-                        regexes.append((token, v))
-                    elif k.startswith('tag.') and (k.endswith('.fg') or k.endswith('.bg')):
-                        # tag.<name>.(fg|bg)
-                        parts = k.split('.')
-                        if len(parts) >= 3:
-                            tagname = parts[1]
-                            which = parts[2]
-                            tags.setdefault(tagname, {})[which] = v.strip() if v else ''
+                csv_lists = {}
+                name = None
+                exts = []
+                try:
+                    with open(path, 'r', encoding='utf-8') as f:
+                        in_syntax = False
+                        for raw in f:
+                            line = raw.rstrip('\n')
+                            s = line.strip()
+                            if not in_syntax:
+                                if s.startswith('[') and s.lower().startswith('[syntax'):
+                                    in_syntax = True
+                                continue
+                            # end of syntax section
+                            if s.startswith('[') and in_syntax:
+                                break
+                            if not s or s.startswith(';') or s.startswith('#'):
+                                continue
+                            # name
+                            m = re.match(r'^name\s*=\s*(.*)$', line, flags=re.I)
+                            if m:
+                                name = m.group(1).strip()
+                                continue
+                            m = re.match(r'^detect\.ext\s*=\s*(.*)$', line, flags=re.I)
+                            if m:
+                                exts_raw = m.group(1).strip()
+                                exts = [e.strip().lstrip('.') for e in re.split('[,;]', exts_raw) if e.strip()]
+                                continue
+                            # regex lines: regex.<TOKEN>_RE = <pattern>
+                            m = re.match(r'^\s*regex\.([^.=\s]+)_RE\s*=\s*(.*)$', line)
+                            if m:
+                                token = m.group(1)
+                                pat = m.group(2).rstrip()
+                                # Unwrap raw-style R"..." or R'...' fragments inside the
+                                # pattern so they're valid Python regex syntax.
+                                try:
+                                    pat = re.sub(r'[rR]"((?:\\.|[^"\\])*)"', r'\1', pat, flags=re.DOTALL)
+                                    pat = re.sub(r"[rR]'((?:\\.|[^'\\])*)'", r"\1", pat, flags=re.DOTALL)
+                                    # If the entire RHS is quoted, unwrap it
+                                    if (pat.startswith('"') and pat.endswith('"')) or (pat.startswith("'") and pat.endswith("'")):
+                                        pat = pat[1:-1]
+                                except Exception:
+                                    pass
+                                regexes.append((token, pat))
+                                continue
+                            # tag.<name>.(fg|bg)
+                            m = re.match(r'^\s*tag\.([^.\s]+)\.(fg|bg)\s*=\s*(.*)$', line)
+                            if m:
+                                tagname = m.group(1)
+                                which = m.group(2)
+                                val = m.group(3).strip()
+                                tags.setdefault(tagname, {})[which] = val
+                                continue
+                            # csv lists like keywords.csv = a,b,c
+                            m = re.match(r'^\s*([A-Za-z0-9_]+)\.csv\s*=\s*(.*)$', line)
+                            if m:
+                                tok = m.group(1)
+                                val = m.group(2).strip()
+                                csv_lists[tok] = val
+                                continue
+                except Exception:
+                    # fallback: skip file on read error
+                    continue
+                if not name:
+                    name = os.path.splitext(fn)[0]
+
+                # If CSV keyword lists were present, convert them to regexes
+                for tok, csv in csv_lists.items():
+                    try:
+                        words = [w.strip() for w in re.split('[,\s]+', csv) if w.strip()]
+                        if words:
+                            parts = [re.escape(w) for w in words]
+                            pat = r'\b(?:' + '|'.join(parts) + r')\b'
+                            tname = tok.rstrip('s') if tok.endswith('s') else tok
+                            regexes.append((tname.upper(), pat))
+                    except Exception:
+                        pass
 
                 # store parsed syntax
                 self._syntaxes[name] = {
@@ -65,6 +121,16 @@ class SyntaxHighlighter:
                     'regexes': regexes,
                     'tags': tags,
                 }
+                # Optional debug: print parsed regex tokens and tag keys when enabled
+                try:
+                    if os.environ.get('SYNTAX_DEBUG'):
+                        print(f"[SYNTAX_DEBUG] Loaded syntax: {name}")
+                        print(f"  file: {path}")
+                        print(f"  exts: {exts}")
+                        print(f"  regex tokens: {[t for t, _ in regexes]}")
+                        print(f"  tag keys: {list(tags.keys())}")
+                except Exception:
+                    pass
             except Exception:
                 # ignore file parse errors
                 continue

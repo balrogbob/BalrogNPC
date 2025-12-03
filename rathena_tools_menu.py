@@ -846,39 +846,39 @@ def create_rathena_menu(root, menuBar, textArea):
     
     rathenaMenu.add_command(
         label="New NPC Script",
-        command=lambda: launch_npc_wizard(root, get_textarea)
+        command=lambda: launch_npc_wizard(root, get_textarea, textArea)
     )
     rathenaMenu.add_command(
         label="New Function",
-        command=lambda: launch_function_creator(root, get_textarea)
+        command=lambda: launch_function_creator(root, get_textarea, textArea)
     )
     rathenaMenu.add_separator()
     rathenaMenu.add_command(
         label="NPC Wizard...",
-        command=lambda: launch_npc_wizard(root, get_textarea)
+        command=lambda: launch_npc_wizard(root, get_textarea, textArea)
     )
     rathenaMenu.add_command(
         label="Dialog Builder...",
-        command=lambda: launch_dialog_builder(root, get_textarea)
+        command=lambda: launch_dialog_builder(root, get_textarea, textArea)
     )
     rathenaMenu.add_separator()
     rathenaMenu.add_command(
         label="Validate Script",
-        command=lambda: validate_current_script(root, get_textarea)
+        command=lambda: validate_current_script(root, get_textarea, textArea)
     )
     rathenaMenu.add_command(
         label="Validate YAML Database",
-        command=lambda: validate_yaml_database(root, get_textarea)
+        command=lambda: validate_yaml_database(root, get_textarea, textArea)
     )
     rathenaMenu.add_command(
         label="Insert Quick NPC",
-        command=lambda: insert_quick_npc(root, get_textarea)
+        command=lambda: insert_quick_npc(root, get_textarea, textArea)
     )
     
     return rathenaMenu
 
 
-def launch_npc_wizard(root, get_textarea):
+def launch_npc_wizard(root, get_textarea, app_ref=None):
     """Launch the NPC Wizard dialog."""
     if not _RATHENA_TOOLS_AVAILABLE:
         messagebox.showerror(
@@ -909,6 +909,13 @@ def launch_npc_wizard(root, get_textarea):
                 
                 # Insert into text area
                 textArea.insert('end', '\n' + script_text)
+                # Notify host app that external insert occurred
+                try:
+                    app = app_ref
+                    if hasattr(app, 'on_external_insert'):
+                        app.on_external_insert('script')
+                except Exception:
+                    pass
                 messagebox.showinfo("Success", f"NPC '{npc.name}' inserted successfully!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to insert script: {e}")
@@ -923,7 +930,7 @@ def launch_npc_wizard(root, get_textarea):
         messagebox.showerror("Error", f"NPC Wizard error: {e}")
 
 
-def launch_function_creator(root, get_textarea):
+def launch_function_creator(root, get_textarea, app_ref=None):
     """Launch enhanced function creator with types and templates."""
     if not _RATHENA_TOOLS_AVAILABLE:
         messagebox.showerror(
@@ -1228,6 +1235,12 @@ return 0;  // Outside time range"""
                 return
             
             textArea.insert('insert', '\n' + script_text + '\n')
+            try:
+                app = app_ref
+                if hasattr(app, 'on_external_insert'):
+                    app.on_external_insert('script')
+            except Exception:
+                pass
             messagebox.showinfo("Success", "Function inserted at cursor position!")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to insert: {e}")
@@ -1290,6 +1303,12 @@ return 0;  // Outside time range"""
                 return
             
             textArea.insert('insert', '\n' + script_text + '\n')
+            try:
+                app = app_ref
+                if hasattr(app, 'on_external_insert'):
+                    app.on_external_insert('script')
+            except Exception:
+                pass
             messagebox.showinfo("Success", "Function inserted successfully!")
             dlg.destroy()
         except Exception as e:
@@ -1305,6 +1324,12 @@ return 0;  // Outside time range"""
                 return
             
             textArea.insert('insert', '\n' + script_text + '\n')
+            try:
+                app = app_ref
+                if hasattr(app, 'on_external_insert'):
+                    app.on_external_insert('script')
+            except Exception:
+                pass
             messagebox.showinfo("Success", "Function inserted! Dialog remains open for more functions.")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to insert function: {e}")
@@ -1323,7 +1348,7 @@ return 0;  // Outside time range"""
 
 
 
-def launch_dialog_builder(root, get_textarea):
+def launch_dialog_builder(root, get_textarea, app_ref=None):
     """Launch the interactive Dialog Builder."""
     if not _RATHENA_TOOLS_AVAILABLE:
         messagebox.showerror(
@@ -1764,6 +1789,12 @@ def launch_dialog_builder(root, get_textarea):
                 commands = [action.to_script_command() for action in dialog_actions]
                 output = '\n'.join(commands)
                 textArea.insert('end', '\n' + output + '\n')
+                try:
+                    app = app_ref
+                    if hasattr(app, 'on_external_insert'):
+                        app.on_external_insert('script')
+                except Exception:
+                    pass
                 messagebox.showinfo("Success", "Dialog commands inserted into editor!")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to insert: {e}")
@@ -1783,6 +1814,12 @@ def launch_dialog_builder(root, get_textarea):
                 commands = [action.to_script_command() for action in dialog_actions]
                 output = '\n'.join(commands)
                 textArea.insert('end', '\n' + output + '\n')
+                try:
+                    app = app_ref
+                    if hasattr(app, 'on_external_insert'):
+                        app.on_external_insert('script')
+                except Exception:
+                    pass
                 messagebox.showinfo("Success", "Dialog commands inserted!")
                 dlg.destroy()
             except Exception as e:
@@ -1798,7 +1835,7 @@ def launch_dialog_builder(root, get_textarea):
         messagebox.showerror("Error", f"Dialog Builder error: {e}")
 
 
-def validate_current_script(root, get_textarea):
+def validate_current_script(root, get_textarea, app_ref=None):
     """Validate the current script with line-by-line error highlighting."""
     if not _RATHENA_TOOLS_AVAILABLE:
         messagebox.showerror(
@@ -2571,7 +2608,7 @@ def validate_current_script(root, get_textarea):
         messagebox.showerror("Error", f"Validation error: {e}")
 
 
-def validate_yaml_database(root, get_textarea):
+def validate_yaml_database(root, get_textarea, app_ref=None):
     """Validate rAthena YAML database files."""
     if not _YAML_VALIDATOR_AVAILABLE:
         messagebox.showerror(
@@ -2741,7 +2778,7 @@ def validate_yaml_database(root, get_textarea):
         messagebox.showerror("Error", f"YAML validation error: {e}")
 
 
-def insert_quick_npc(root, get_textarea):
+def insert_quick_npc(root, get_textarea, app_ref=None):
     """Insert a quick/template NPC with pre-built templates."""
     if not _RATHENA_TOOLS_AVAILABLE:
         messagebox.showerror(
@@ -3124,6 +3161,12 @@ def insert_quick_npc(root, get_textarea):
                 messagebox.showwarning("Empty", "Preview is empty.")
                 return
             textArea.insert('insert', '\n' + content + '\n')
+            try:
+                app = app_ref
+                if hasattr(app, 'on_external_insert'):
+                    app.on_external_insert('script')
+            except Exception:
+                pass
             messagebox.showinfo("Success", "Preview inserted into editor!")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to insert preview: {e}")
@@ -3284,6 +3327,12 @@ def create_npc():
         script_text = gen.generate_script()
             
         textArea.insert('end', '\n' + script_text + '\n')
+        try:
+            app = app_ref
+            if hasattr(app, 'on_external_insert'):
+                app.on_external_insert('script')
+        except Exception:
+            pass
         messagebox.showinfo("Success", f"{selected_template} NPC inserted successfully!")
         dlg.destroy()
             

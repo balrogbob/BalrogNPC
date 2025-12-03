@@ -48,7 +48,6 @@ try:
             win._center_attempts = getattr(win, '_center_attempts', 0) + 1
             win.update_idletasks()
 
-            # prefer actual size, fallback to geometry or requested size
             w = win.winfo_width()
             h = win.winfo_height()
             if w <= 1 or h <= 1:
@@ -60,52 +59,18 @@ try:
                     w = win.winfo_reqwidth() or 300
                     h = win.winfo_reqheight() or 150
 
-            # if still too small, retry shortly (allow layout to settle)
             if (w <= 50 or h <= 30) and win._center_attempts < 8:
                 try:
                     win.after(60, lambda: _center_later(win))
                     return
                 except Exception:
                     pass
-
-            parent = getattr(win, 'master', None)
-            if parent:
-                try:
-                    rx = parent.winfo_rootx()
-                    ry = parent.winfo_rooty()
-                    rw = parent.winfo_width()
-                    rh = parent.winfo_height()
-                    x = rx + max((rw - w) // 2, 0)
-                    y = ry + max((rh - h) // 2, 0)
-                except Exception:
-                    sw = win.winfo_screenwidth()
-                    sh = win.winfo_screenheight()
-                    x = max((sw - w) // 2, 0)
-                    y = max((sh - h) // 2, 0)
-            else:
-                sw = win.winfo_screenwidth()
-                sh = win.winfo_screenheight()
-                x = max((sw - w) // 2, 0)
-                y = max((sh - h) // 2, 0)
-
-            # Clamp to screen bounds
-            sw = win.winfo_screenwidth()
-            sh = win.winfo_screenheight()
-            if x + w > sw:
-                x = max(sw - w, 0)
-            if y + h > sh:
-                y = max(sh - h, 0)
-
-            # Apply geometry
-            win.geometry(f"{w}x{h}+{x}+{y}")
         except Exception:
             pass
 
-    def _wrapped_init(self, *args, **kwargs):
-        # call original initializer (preserves class identity and super() behavior)
-        _orig_init(self, *args, **kwargs)
 
-        # schedule centering once layout has a chance to settle, and center on map
+    def _wrapped_init(self, *args, **kwargs):
+        _orig_init(self, *args, **kwargs)
         try:
             self._center_attempts = 0
             def _on_map(event):
@@ -126,12 +91,10 @@ try:
             except Exception:
                 pass
 
-    # Replace the initializer only (keeps Toplevel class identity)
     _orig_toplevel.__init__ = _wrapped_init
 except Exception:
     pass
-
-
+ 
 class BalrogNPC:
     """Simple text editor with rAthena Tools integration"""
     
@@ -181,6 +144,17 @@ class BalrogNPC:
         # Add rAthena Tools menu if available
         if _RATHENA_TOOLS_AVAILABLE:
             create_rathena_menu(self.root, self.menuBar, self)
+
+        # Syntax menu (Script / Database / None)
+        syntaxMenu = Menu(self.menuBar, tearoff=False)
+        self.menuBar.add_cascade(label="Syntax", menu=syntaxMenu)
+        # syntax_mode values: 'script', 'database', 'none'
+        self.syntax_mode = StringVar(value='none')
+        syntaxMenu.add_radiobutton(label="Script", variable=self.syntax_mode, value='script', command=self._on_syntax_menu_change)
+        syntaxMenu.add_radiobutton(label="Database", variable=self.syntax_mode, value='database', command=self._on_syntax_menu_change)
+        syntaxMenu.add_radiobutton(label="None", variable=self.syntax_mode, value='none', command=self._on_syntax_menu_change)
+        syntaxMenu.add_separator()
+        syntaxMenu.add_command(label="Edit Colors...", command=self.edit_syntax_colors_dialog)
         
         # Help menu
         helpMenu = Menu(self.menuBar, tearoff=False)
@@ -250,6 +224,193 @@ class BalrogNPC:
         
         # Word wrap state
         self.word_wrap_enabled = False
+
+    def edit_syntax_colors_dialog(self):
+        """Open a simple dialog to edit syntax tag fg/bg colors in syntax INI files."""
+        try:
+            import configparser
+            syn_dir = os.path.join(os.path.dirname(__file__), 'syntax')
+            if not os.path.isdir(syn_dir):
+                messagebox.showerror('Error', 'No syntax directory found')
+                return
+
+            files = [f for f in os.listdir(syn_dir) if f.lower().endswith('.ini')]
+            if not files:
+                messagebox.showerror('Error', 'No syntax INI files found')
+                return
+
+            dlg = Toplevel(self.root)
+            dlg.title('Edit Syntax Colors')
+            dlg.transient(self.root)
+            dlg.grab_set()
+            dlg.geometry('560x360')
+
+            frm = ttk.Frame(dlg, padding=8)
+            frm.pack(fill=BOTH, expand=True)
+
+            top = ttk.Frame(frm)
+            top.pack(fill=X)
+            ttk.Label(top, text='Syntax file:').pack(side=LEFT)
+            file_var = StringVar(value=files[0])
+            file_cb = ttk.Combobox(top, textvariable=file_var, values=files, state='readonly', width=40)
+            file_cb.pack(side=LEFT, padx=8)
+
+            body = ttk.Frame(frm)
+            body.pack(fill=BOTH, expand=True, pady=(8,0))
+
+            lb = Listbox(body)
+            lb.pack(side=LEFT, fill=BOTH, expand=True)
+            sb = Scrollbar(body, command=lb.yview)
+            sb.pack(side=LEFT, fill=Y)
+            lb.config(yscrollcommand=sb.set)
+
+            right = ttk.Frame(body)
+            right.pack(side=RIGHT, fill=Y, padx=(8,0))
+            ttk.Label(right, text='Foreground (#RRGGBB):').pack(anchor=W)
+            fg_var = StringVar()
+            fg_entry = ttk.Entry(right, textvariable=fg_var, width=16)
+            fg_entry.pack(pady=(0,6))
+            ttk.Label(right, text='Background (#RRGGBB):').pack(anchor=W)
+            bg_var = StringVar()
+            bg_entry = ttk.Entry(right, textvariable=bg_var, width=16)
+            bg_entry.pack(pady=(0,6))
+
+            def load_file(fn):
+                # Always parse file lines for tag.* entries to be robust
+                lb.delete(0, END)
+                path = os.path.join(syn_dir, fn)
+                tags = {}
+                try:
+                    import re
+                    with open(path, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            m = re.match(r"^\s*tag\.([^\.\s]+)\.(fg|bg)\s*=\s*(.*)$", line)
+                            if m:
+                                t = m.group(1)
+                                which = m.group(2)
+                                val = m.group(3).strip()
+                                tags.setdefault(t, {})[which] = val
+                except Exception:
+                    return
+
+                for t in sorted(tags.keys()):
+                    fg = tags[t].get('fg', '')
+                    bg = tags[t].get('bg', '')
+                    lb.insert(END, f"{t}\tfg={fg}\tbg={bg}")
+
+            def on_sel(evt=None):
+                sel = lb.curselection()
+                if not sel:
+                    return
+                txt = lb.get(sel[0])
+                # simple parse
+                parts = txt.split()
+                fg = ''
+                bg = ''
+                for p in parts:
+                    if p.startswith('fg='):
+                        fg = p.split('=',1)[1]
+                    if p.startswith('bg='):
+                        bg = p.split('=',1)[1]
+                fg_var.set(fg)
+                bg_var.set(bg)
+
+            def save_color():
+                sel = lb.curselection()
+                if not sel:
+                    return
+                line = lb.get(sel[0])
+                tagname = line.split()[0]
+                newfg = fg_var.get().strip()
+                newbg = bg_var.get().strip()
+                fn = file_var.get()
+                path = os.path.join(syn_dir, fn)
+                cfg = configparser.RawConfigParser()
+                cfg.optionxform = lambda s: s
+                try:
+                    cfg.read(path, encoding='utf-8')
+                except Exception as e:
+                    messagebox.showerror('Error', f'Failed to read file: {e}', parent=dlg)
+                    return
+                if 'Syntax' not in cfg:
+                    messagebox.showerror('Error', 'Invalid syntax file', parent=dlg)
+                    return
+                sec = cfg['Syntax']
+                if newfg:
+                    sec[f'tag.{tagname}.fg'] = newfg
+                else:
+                    if f'tag.{tagname}.fg' in sec:
+                        del sec[f'tag.{tagname}.fg']
+                if newbg:
+                    sec[f'tag.{tagname}.bg'] = newbg
+                else:
+                    if f'tag.{tagname}.bg' in sec:
+                        del sec[f'tag.{tagname}.bg']
+                try:
+                    with open(path, 'w', encoding='utf-8') as f:
+                        cfg.write(f)
+                except Exception as e:
+                    messagebox.showerror('Error', f'Failed to write file: {e}', parent=dlg)
+                    return
+                load_file(fn)
+                messagebox.showinfo('Saved', 'Colors saved', parent=dlg)
+                # reload highlighter if present
+                try:
+                    if _SYNTAX_AVAILABLE and SyntaxHighlighter is not None:
+                        self.highlighter = SyntaxHighlighter(self.textArea)
+                        try:
+                            self._apply_syntax_mode(self.syntax_mode.get())
+                        except Exception:
+                            pass
+                        self.highlighter.schedule_highlight()
+                except Exception:
+                    pass
+
+            file_cb.bind('<<ComboboxSelected>>', lambda e: load_file(file_var.get()))
+            lb.bind('<<ListboxSelect>>', on_sel)
+
+            btns = ttk.Frame(frm)
+            btns.pack(fill=X, pady=(8,0))
+            ttk.Button(btns, text='Save Color', command=save_color).pack(side=RIGHT, padx=4)
+            ttk.Button(btns, text='Close', command=dlg.destroy).pack(side=RIGHT)
+
+            load_file(files[0])
+            self.center_window(dlg)
+            dlg.wait_window()
+        except Exception as e:
+            messagebox.showerror('Error', f'Failed to open color editor: {e}')
+
+            parent = getattr(win, 'master', None)
+            if parent:
+                try:
+                    rx = parent.winfo_rootx()
+                    ry = parent.winfo_rooty()
+                    rw = parent.winfo_width()
+                    rh = parent.winfo_height()
+                    x = rx + max((rw - w) // 2, 0)
+                    y = ry + max((rh - h) // 2, 0)
+                except Exception:
+                    sw = win.winfo_screenwidth()
+                    sh = win.winfo_screenheight()
+                    x = max((sw - w) // 2, 0)
+                    y = max((sh - h) // 2, 0)
+            else:
+                sw = win.winfo_screenwidth()
+                sh = win.winfo_screenheight()
+                x = max((sw - w) // 2, 0)
+                y = max((sh - h) // 2, 0)
+
+            sw = win.winfo_screenwidth()
+            sh = win.winfo_screenheight()
+            if x + w > sw:
+                x = max(sw - w, 0)
+            if y + h > sh:
+                y = max(sh - h, 0)
+
+            win.geometry(f"{w}x{h}+{x}+{y}")
+        except Exception:
+            pass
+
 
     def on_text_modified(self, event=None):
         """Track when text is modified"""
@@ -662,6 +823,83 @@ class BalrogNPC:
             pass
         dlg.wait_window()
 
+    def _on_syntax_menu_change(self):
+        """Called when user selects a syntax mode from the menu."""
+        mode = self.syntax_mode.get()
+        try:
+            self._apply_syntax_mode(mode)
+        except Exception:
+            pass
+
+    def _apply_syntax_mode(self, mode):
+        """Apply a syntax selection: 'script', 'database', or 'none'.
+
+        This will try to pick a matching syntax loaded by the highlighter.
+        """
+        if not self.highlighter:
+            return
+
+        if mode == 'none' or mode is None:
+            try:
+                self.highlighter.set_syntax(None)
+            except Exception:
+                pass
+            return
+
+        # choose candidates based on mode
+        syn_name = None
+        try:
+            syntaxes = getattr(self.highlighter, '_syntaxes', {})
+            # prefer file ext matching entries
+            for name, s in syntaxes.items():
+                exts = s.get('exts', [])
+                if mode == 'script' and ('npc' in exts or 'script' in name.lower() or 'rath' in name.lower()):
+                    syn_name = name
+                    break
+                if mode == 'database' and any(e in exts for e in ('yml', 'yaml')):
+                    syn_name = name
+                    break
+
+            # fallback: search by name substrings
+            if not syn_name:
+                for name in syntaxes.keys():
+                    ln = name.lower()
+                    if mode == 'script' and ('rath' in ln or 'script' in ln or 'npc' in ln):
+                        syn_name = name
+                        break
+                    if mode == 'database' and ('yaml' in ln or 'yml' in ln or 'db' in ln):
+                        syn_name = name
+                        break
+
+            if syn_name:
+                self.highlighter.set_syntax(syn_name)
+                try:
+                    self.highlighter.highlight()
+                except Exception:
+                    self.highlighter.schedule_highlight()
+            else:
+                # no matching syntax found: clear
+                self.highlighter.set_syntax(None)
+        except Exception:
+            pass
+
+    def on_external_insert(self, syntax_hint=None):
+        """Called when an external tool inserts text into the editor.
+
+        syntax_hint may be 'script' or 'database' to prefer a syntax.
+        """
+        try:
+            # if highlighter present, apply hinted syntax
+            if syntax_hint:
+                self.syntax_mode.set(syntax_hint)
+                self._apply_syntax_mode(syntax_hint)
+            else:
+                # default to script
+                self.syntax_mode.set('script')
+                self._apply_syntax_mode('script')
+        except Exception:
+            pass
+
     def _update_line_numbers(self):
         try:
             last_index = self.textArea.index('end-1c')
@@ -729,6 +967,10 @@ class BalrogNPC:
             if self.highlighter:
                 self.highlighter.set_syntax(None)
                 self.highlighter.highlight()
+                try:
+                    self.syntax_mode.set('none')
+                except Exception:
+                    pass
         except Exception:
             pass
 
@@ -764,7 +1006,20 @@ class BalrogNPC:
                 # set syntax based on file
                 try:
                     if self.highlighter:
-                        self.highlighter.set_syntax_for_file(self.current_file)
+                        name = self.highlighter.set_syntax_for_file(self.current_file)
+                        # reflect detected syntax in menu
+                        try:
+                            if name:
+                                ln = name.lower()
+                                if 'yaml' in ln or 'yml' in ln or 'db' in ln:
+                                    self.syntax_mode.set('database')
+                                else:
+                                    # treat as script by default
+                                    self.syntax_mode.set('script')
+                            else:
+                                self.syntax_mode.set('none')
+                        except Exception:
+                            pass
                         self.highlighter.highlight()
                 except Exception:
                     pass
@@ -813,7 +1068,18 @@ class BalrogNPC:
             self.update_title()
             try:
                 if self.highlighter:
-                    self.highlighter.set_syntax_for_file(self.current_file)
+                    name = self.highlighter.set_syntax_for_file(self.current_file)
+                    try:
+                        if name:
+                            ln = name.lower()
+                            if 'yaml' in ln or 'yml' in ln or 'db' in ln:
+                                self.syntax_mode.set('database')
+                            else:
+                                self.syntax_mode.set('script')
+                        else:
+                            self.syntax_mode.set('none')
+                    except Exception:
+                        pass
                     self.highlighter.highlight()
             except Exception:
                 pass
