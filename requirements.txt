@@ -1,0 +1,8 @@
+# BalrogNPC Requirements
+# Basic requirements for running BalrogNPC
+
+# Core - usually included with Python
+# tkinter (comes with Python on Windows, may need python3-tk on Linux)
+
+# Optional - for YAML validation
+pyyaml>=5.1
