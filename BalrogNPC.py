@@ -14,6 +14,14 @@ from tkinter import font as tkfont
 import os
 import sys
 
+# Syntax highlighter
+try:
+    from syntax_highlighter import SyntaxHighlighter
+    _SYNTAX_AVAILABLE = True
+except Exception:
+    SyntaxHighlighter = None
+    _SYNTAX_AVAILABLE = False
+
 # Ensure rathena-tools package is in path
 _current_dir = os.path.dirname(os.path.abspath(__file__))
 _rathena_path = os.path.join(_current_dir, 'rathena-tools')
@@ -212,11 +220,19 @@ class BalrogNPC:
         
         # Track modifications
         self.textArea.bind('<<Modified>>', self.on_text_modified)
-        # Update line numbers on edits and keys
-        self.textArea.bind('<KeyRelease>', lambda e: self._update_line_numbers())
-        self.textArea.bind('<MouseWheel>', lambda e: self._update_line_numbers())
+        # Update line numbers on edits and keys, and schedule syntax highlight
+        self.textArea.bind('<KeyRelease>', lambda e: (self._update_line_numbers(), self._on_key(e)))
+        self.textArea.bind('<MouseWheel>', lambda e: (self._update_line_numbers(), self._on_key(e)))
         self.line_numbers.bind('<Button-1>', lambda e: self._on_ln_click(e))
         
+        # Syntax highlighter
+        self.highlighter = None
+        if _SYNTAX_AVAILABLE and SyntaxHighlighter is not None:
+            try:
+                self.highlighter = SyntaxHighlighter(self.textArea)
+            except Exception:
+                self.highlighter = None
+
         # Bind keyboard shortcuts
         self.root.bind('<Control-n>', lambda e: self.new_file())
         self.root.bind('<Control-o>', lambda e: self.open_file())
@@ -234,7 +250,7 @@ class BalrogNPC:
         
         # Word wrap state
         self.word_wrap_enabled = False
-        
+
     def on_text_modified(self, event=None):
         """Track when text is modified"""
         if self.textArea.edit_modified():
@@ -246,6 +262,20 @@ class BalrogNPC:
                 self._update_line_numbers()
             except Exception:
                 pass
+            # schedule highlight
+            try:
+                if self.highlighter:
+                    self.highlighter.schedule_highlight()
+            except Exception:
+                pass
+
+    def _on_key(self, event=None):
+        """Called on key/mouse events to schedule highlighting."""
+        try:
+            if self.highlighter:
+                self.highlighter.schedule_highlight()
+        except Exception:
+            pass
 
     def center_window(self, win):
         """Center a Toplevel window on the application root (or screen)."""
@@ -300,7 +330,7 @@ class BalrogNPC:
                 win.geometry(f"{w}x{h}+{x}+{y}")
             except Exception:
                 pass
-    
+
     def update_title(self):
         """Update window title"""
         title = "BalrogNPC - "
@@ -313,7 +343,7 @@ class BalrogNPC:
             title += " *"
         
         self.root.title(title)
-    
+
     def check_save(self):
         """Check if user wants to save before proceeding"""
         if self.modified:
@@ -694,12 +724,19 @@ class BalrogNPC:
             self._update_line_numbers()
         except Exception:
             pass
-    
+        # clear syntax highlighting when new file
+        try:
+            if self.highlighter:
+                self.highlighter.set_syntax(None)
+                self.highlighter.highlight()
+        except Exception:
+            pass
+
     def open_file(self):
         """Open an existing file"""
         if not self.check_save():
             return
-        
+
         filepath = filedialog.askopenfilename(
             defaultextension=".txt",
             filetypes=[
@@ -709,12 +746,12 @@ class BalrogNPC:
                 ("YAML Files", "*.yml;*.yaml")
             ]
         )
-        
+
         if filepath:
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
-                
+
                 self.textArea.delete(1.0, END)
                 self.textArea.insert(1.0, content)
                 self.current_file = filepath
@@ -724,12 +761,19 @@ class BalrogNPC:
                     self._update_line_numbers()
                 except Exception:
                     pass
+                # set syntax based on file
+                try:
+                    if self.highlighter:
+                        self.highlighter.set_syntax_for_file(self.current_file)
+                        self.highlighter.highlight()
+                except Exception:
+                    pass
             except Exception as e:
                 messagebox.showerror(
                     "Error",
                     f"Could not open file:\n{str(e)}"
                 )
-    
+
     def save_file(self):
         """Save current file"""
         if self.current_file:
@@ -767,6 +811,12 @@ class BalrogNPC:
             self.current_file = filepath
             self.modified = False
             self.update_title()
+            try:
+                if self.highlighter:
+                    self.highlighter.set_syntax_for_file(self.current_file)
+                    self.highlighter.highlight()
+            except Exception:
+                pass
             return True
         except Exception as e:
             messagebox.showerror(

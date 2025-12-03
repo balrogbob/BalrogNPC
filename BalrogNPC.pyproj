@@ -26,6 +26,9 @@
     <Content Include="requirements.txt" />
     <Content Include="Screenshot 2025-12-03 070440.png" />
     <Content Include="Screenshot 2025-12-03 070456.png" />
+    <Content Include="syntax\rathena.ini" />
+    <Content Include="syntax\yaml.ini" />
+    <Content Include="syntax\yaml_header.ini" />
     <Content Include="USER_GUIDE.md" />
   </ItemGroup>
   <ItemGroup>
@@ -37,10 +40,12 @@
     <Compile Include="rathena-tools\rathena_yaml_validator.py" />
     <Compile Include="rathena-tools\__init__.py" />
     <Compile Include="rathena_tools_menu.py" />
+    <Compile Include="syntax_highlighter.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="rathena-tools" />
     <Folder Include="rathena-tools\lib" />
+    <Folder Include="syntax\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|balrognpc" />
