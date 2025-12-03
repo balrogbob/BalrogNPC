@@ -268,12 +268,20 @@ class BalrogNPC:
             right.pack(side=RIGHT, fill=Y, padx=(8,0))
             ttk.Label(right, text='Foreground (#RRGGBB):').pack(anchor=W)
             fg_var = StringVar()
-            fg_entry = ttk.Entry(right, textvariable=fg_var, width=16)
-            fg_entry.pack(pady=(0,6))
+            # Picker + entry
+            fg_frame = ttk.Frame(right)
+            fg_frame.pack(pady=(0,6), anchor=W)
+            fg_entry = ttk.Entry(fg_frame, textvariable=fg_var, width=12)
+            fg_entry.pack(side=LEFT)
+            ttk.Button(fg_frame, text='Pick...', command=lambda: pick_color(fg_var)).pack(side=LEFT, padx=(6,0))
+
             ttk.Label(right, text='Background (#RRGGBB):').pack(anchor=W)
             bg_var = StringVar()
-            bg_entry = ttk.Entry(right, textvariable=bg_var, width=16)
-            bg_entry.pack(pady=(0,6))
+            bg_frame = ttk.Frame(right)
+            bg_frame.pack(pady=(0,6), anchor=W)
+            bg_entry = ttk.Entry(bg_frame, textvariable=bg_var, width=12)
+            bg_entry.pack(side=LEFT)
+            ttk.Button(bg_frame, text='Pick...', command=lambda: pick_color(bg_var)).pack(side=LEFT, padx=(6,0))
 
             def load_file(fn):
                 # Always parse file lines for tag.* entries to be robust
@@ -297,6 +305,19 @@ class BalrogNPC:
                     fg = tags[t].get('fg', '')
                     bg = tags[t].get('bg', '')
                     lb.insert(END, f"{t}\tfg={fg}\tbg={bg}")
+
+            def pick_color(var):
+                try:
+                    from tkinter import colorchooser
+                    cur = var.get().strip() or '#000000'
+                    # ensure valid hex for initial color
+                    if not cur.startswith('#'):
+                        cur = '#' + cur
+                    color = colorchooser.askcolor(color=cur, parent=dlg)
+                    if color and color[1]:
+                        var.set(color[1].upper())
+                except Exception:
+                    pass
 
             def on_sel(evt=None):
                 sel = lb.curselection()
