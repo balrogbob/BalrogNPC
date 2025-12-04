@@ -244,7 +244,7 @@ class MarkdownViewer:
             first_doc = sorted(self.available_docs.keys())[0]
             self.load_document(first_doc)
     
-    def load_document(self, doc_name, add_to_history=True):
+    def load_document(self, doc_name, add_to_history=True, anchor=None):
         """
         Load and render a markdown document.
         
@@ -281,6 +281,10 @@ class MarkdownViewer:
             
             # Render markdown
             self._render_markdown(content)
+
+            # Jump to anchor if provided
+            if anchor:
+                self._jump_to_anchor(anchor)
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load document:\n{str(e)}")
@@ -301,6 +305,8 @@ class MarkdownViewer:
         # Clear TOC
         self.toc_listbox.delete(0, END)
         self.toc_items = []  # Store TOC items with their positions
+        # Reset anchors map for current document
+        self.anchors = {}
         
         # Parse and render markdown line by line
         lines = content.split('\n')
@@ -347,6 +353,9 @@ class MarkdownViewer:
                     # Store position for jumping
                     pos = self.text_widget.index('insert')
                     self.toc_items.append(pos)
+                # Store anchor mapping for header
+                anchor_key = self._make_anchor_key(text)
+                self.anchors[anchor_key] = self.text_widget.index('insert')
                 
                 self._insert_header(level, text)
                 i += 1
@@ -568,29 +577,49 @@ class MarkdownViewer:
         if not url:
             return
         
-        # Check if it's an internal link to another document
-        if url.endswith('.md'):
-            # Extract document name
-            doc_name = os.path.splitext(os.path.basename(url))[0]
-            
+        # Internal link handling: file.md, file.md#anchor, #anchor
+        if url.endswith('.md') or '.md#' in url:
+            doc_part, _, anchor_part = url.partition('#')
+            doc_name = os.path.splitext(os.path.basename(doc_part))[0] if doc_part else None
+            anchor = anchor_part if anchor_part else None
+            # If no document specified, use current
+            if not doc_name:
+                doc_name = self.current_doc
             # Check if document exists
             if doc_name in self.available_docs:
-                self.load_document(doc_name)
+                self.load_document(doc_name, anchor=anchor)
                 return
         
         # Check for anchor links within same document
         if url.startswith('#'):
-            # Find header with this anchor
-            anchor = url[1:].lower().replace('-', ' ')
-            # Search in text widget for matching header
-            # (simplified - would need more sophisticated anchor matching)
-            self.status_var.set(f"Anchor link: {url} (not yet implemented)")
+            anchor = url[1:]
+            self._jump_to_anchor(anchor)
             return
         
         # External link - show info
         self.status_var.set(f"External link: {url}")
         messagebox.showinfo("External Link", 
                           f"This is an external link:\n{url}\n\nOpen this in your web browser.")
+
+    def _make_anchor_key(self, text):
+        """Create a normalized anchor key from header text similar to GitHub style."""
+        key = text.strip().lower()
+        # Replace spaces with hyphens and remove non-alphanum except hyphens
+        key = re.sub(r'\s+', '-', key)
+        key = re.sub(r'[^a-z0-9\-]', '', key)
+        return key
+
+    def _jump_to_anchor(self, anchor):
+        """Jump to a header anchor within the current document."""
+        if not anchor:
+            return
+        key = self._make_anchor_key(anchor)
+        pos = self.anchors.get(key)
+        if pos:
+            self.text_widget.see(pos)
+            self.status_var.set(f"Jumped to section: #{key}")
+        else:
+            self.status_var.set(f"Section not found: #{key}")
     
     def _on_doc_selected(self, event=None):
         """Handle document selection from dropdown."""
