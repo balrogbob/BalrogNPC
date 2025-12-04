@@ -44,12 +44,12 @@ If you don't have Python installed:
 
 **Option A: Using Git**
 ```bash
-git clone https://github.com/balrogbob/BalrogNPC.git
+git clone <repository-url>
 cd BalrogNPC
 ```
 
 **Option B: Direct Download**
-1. Download ZIP from [GitHub Releases](https://github.com/balrogbob/BalrogNPC/releases)
+1. Download ZIP from GitHub Releases (see repository)
 2. Extract to desired location
 3. Open folder in terminal/command prompt
 

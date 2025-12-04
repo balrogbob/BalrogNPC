@@ -1,4 +1,4 @@
-# Script Examples for BalrogNPC
+﻿# Script Examples for BalrogNPC
 
 **Working code examples for common NPC types**
 
@@ -238,17 +238,17 @@ prontera,155,155,4	script	Job Changer	1_F_PRIEST,{
 prontera,165,165,4	script	Info NPC	8W_SOLDIER,{
 	mes "[Server Info]";
 	mes "^0000FFServer Information^000000";
-	mes "?????????????????????????";
+	mes "─────────────────────────";
 	mes "^008000Rates:^000000";
-	mes "  � Base EXP: 1x";
-	mes "  � Job EXP: 1x";
-	mes "  � Drop: 1x";
+	mes "  • Base EXP: 1x";
+	mes "  • Job EXP: 1x";
+	mes "  • Drop: 1x";
 	next;
 	
 	mes "[Server Info]";
 	mes "^008000Max Stats:^000000";
-	mes "  � Max Level: 99/70";
-	mes "  � Max Stats: 99";
+	mes "  • Max Level: 99/70";
+	mes "  • Max Stats: 99";
 	close;
 }
 ```
@@ -326,7 +326,7 @@ OnClock1800:  // 6:00 PM
    - Edit dialog text
 
 3. **Validate**
-   - Use **rAthena Tools ? Validate Script**
+   - Use **rAthena Tools → Validate Script**
    - Fix any errors
 
 4. **Save**
@@ -386,4 +386,4 @@ set MyCustomQuest, 1;
 
 ---
 
-**Practice with these examples to master rAthena scripting!** ???
+**Practice with these examples to master rAthena scripting!** 🎮✨

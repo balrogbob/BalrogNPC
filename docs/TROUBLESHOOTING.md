@@ -1,4 +1,4 @@
-# Troubleshooting Guide
+﻿# Troubleshooting Guide
 
 **Solutions to common issues with BalrogNPC**
 
@@ -125,7 +125,7 @@ sudo apt-get install python3-tk
 **Problem:** Color configuration issue
 
 **Solution:**
-1. Click **Syntax ? Edit Colors...**
+1. Click **Syntax → Edit Colors...**
 2. Adjust foreground/background colors
 3. Click **Save Color**
 4. Restart BalrogNPC
@@ -135,7 +135,7 @@ sudo apt-get install python3-tk
 **Problem:** Performance issue
 
 **Solution:**
-1. Disable syntax highlighting: **Syntax ? None**
+1. Disable syntax highlighting: **Syntax → None**
 2. Or split large file into smaller files
 
 ---
@@ -220,7 +220,7 @@ pip install pyyaml
 **Problem:** Syntax highlighting overhead
 
 **Solution:**
-1. Disable syntax: **Syntax ? None**
+1. Disable syntax: **Syntax → None**
 2. Reduce file size
 3. Close other applications
 
@@ -242,7 +242,7 @@ pip install pyyaml
 **Problem:** Font size issue
 
 **Solution:**
-1. Click **Format ? Font...**
+1. Click **Format → Font...**
 2. Adjust slider
 3. Click OK
 
@@ -285,8 +285,8 @@ python3 BalrogNPC.py
 ### macOS
 
 **Gatekeeper Blocks:**
-- Right-click ? Open
-- Or: System Preferences ? Security ? Allow
+- Right-click → Open
+- Or: System Preferences → Security → Allow
 
 **Python Version:**
 - Use `python3` instead of `python`
@@ -302,7 +302,7 @@ python3 BalrogNPC.py
 3. [FAQ](FAQ.md)
 
 ### Report Issues
-1. Check existing [GitHub Issues](https://github.com/balrogbob/BalrogNPC/issues)
+1. Check existing GitHub Issues (see repository)
 2. Create new issue with:
    - Operating system
    - Python version
@@ -348,12 +348,12 @@ python3 BalrogNPC.py
 
 ## Best Practices to Avoid Issues
 
-? **Save frequently** - `Ctrl+S` after changes  
-? **Validate before use** - Run validator on scripts  
-? **Keep backups** - Copy important files  
-? **Update regularly** - Check for new versions  
-? **Report bugs** - Help improve BalrogNPC  
+✅ **Save frequently** - `Ctrl+S` after changes  
+✅ **Validate before use** - Run validator on scripts  
+✅ **Keep backups** - Copy important files  
+✅ **Update regularly** - Check for new versions  
+✅ **Report bugs** - Help improve BalrogNPC  
 
 ---
 
-**Still having issues?** [Create a GitHub Issue](https://github.com/balrogbob/BalrogNPC/issues) with details!
+**Still having issues?** Create a GitHub Issue (see repository) with details!

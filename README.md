@@ -16,6 +16,7 @@
 
 ## What's New ✨
 
+- **Built-in Documentation Viewer** - Press `F1` to view all documentation with GitHub-style rendering 📖
 - **Line Numbers** - Left-side gutter for easy navigation 🔢
 - **Go To Line** - Jump directly to any line (`Ctrl+G`) ➤
 - **Full Find & Replace** (`Ctrl+F`):
@@ -68,7 +69,7 @@
 **Install:**
 ```bash
 # Clone repository
-git clone https://github.com/balrogbob/BalrogNPC.git
+git clone <repository-url>
 cd BalrogNPC
 
 # Optional: Install YAML support
@@ -135,6 +136,7 @@ Done! You've created your first NPC.
 
 ### Essential Shortcuts
 ```
+F1      View Documentation
 Ctrl+N  New file
 Ctrl+O  Open file
 Ctrl+S  Save file
@@ -273,7 +275,7 @@ MIT License - see [LICENSE.txt](LICENSE.txt)
 ## Support & Resources 💬
 
 - **Documentation:** [docs/INDEX.md](docs/INDEX.md)
-- **Issues:** [GitHub Issues](https://github.com/balrogbob/BalrogNPC/issues)
+- **Issues:** GitHub Issues (see repository)
 - **rAthena:** [https://rathena.org](https://rathena.org)
 
 ---

@@ -1,4 +1,4 @@
-# Frequently Asked Questions (FAQ)
+﻿# Frequently Asked Questions (FAQ)
 
 **Quick answers to common questions about BalrogNPC**
 
@@ -16,9 +16,9 @@ Yes! BalrogNPC is completely free and open source (MIT License).
 
 ### What operating systems are supported?
 
-- ? Windows 7/8/10/11
-- ? Linux (most distributions)
-- ? macOS
+- ✅ Windows 7/8/10/11
+- ✅ Linux (most distributions)
+- ✅ macOS
 
 ### Do I need to know Python to use BalrogNPC?
 
@@ -54,11 +54,11 @@ No. BalrogNPC is an **editor**, not a server. You need an rAthena server to run 
 
 ### Does BalrogNPC support syntax highlighting?
 
-Yes! Enable it via **Syntax ? Script** or **Syntax ? Database**.
+Yes! Enable it via **Syntax → Script** or **Syntax → Database**.
 
 ### Can I customize the syntax colors?
 
-Yes! Click **Syntax ? Edit Colors...** to customize foreground and background colors for each syntax element.
+Yes! Click **Syntax → Edit Colors...** to customize foreground and background colors for each syntax element.
 
 ### Does BalrogNPC have auto-complete?
 
@@ -102,14 +102,14 @@ See [Quick NPC Templates](QUICK_NPC_TEMPLATES.md).
 The validator checks for:
 - Syntax errors (missing semicolons, unbalanced brackets)
 - Indentation issues (tabs vs spaces)
-- Common typos (clos ? close)
+- Common typos (clos → close)
 - Best practices
 
 It can auto-fix many issues automatically.
 
 ### Can I validate YAML files?
 
-Yes! Use **rAthena Tools ? Validate YAML Database**. Requires PyYAML:
+Yes! Use **rAthena Tools → Validate YAML Database**. Requires PyYAML:
 ```bash
 pip install pyyaml
 ```
@@ -137,7 +137,7 @@ Yes! Check the "Use Regex" option in the Find & Replace dialog.
 
 ### How do I select all text?
 
-Press `Ctrl+A` or use **Edit ? Select All**.
+Press `Ctrl+A` or use **Edit → Select All**.
 
 ---
 
@@ -230,14 +230,14 @@ See [Troubleshooting](TROUBLESHOOTING.md) for solutions.
 
 | Feature | BalrogNPC | Notepad++ |
 |---------|-----------|-----------|
-| **rAthena Tools** | ? Built-in | ? None |
-| **Script Validation** | ? Yes | ? No |
-| **NPC Templates** | ? 10 templates | ? No |
-| **Syntax Highlighting** | ? rAthena-specific | ?? Generic |
-| **Multi-file** | ? No | ? Yes |
-| **Plugins** | ? No | ? Yes |
-| **Size** | ?? Requires Python | ? Standalone |
-| **Learning Curve** | ? Simple | ?? Moderate |
+| **rAthena Tools** | ✅ Built-in | ❌ None |
+| **Script Validation** | ✅ Yes | ❌ No |
+| **NPC Templates** | ✅ 10 templates | ❌ No |
+| **Syntax Highlighting** | ✅ rAthena-specific | ⚠️ Generic |
+| **Multi-file** | ❌ No | ✅ Yes |
+| **Plugins** | ❌ No | ✅ Yes |
+| **Size** | ⚠️ Requires Python | ✅ Standalone |
+| **Learning Curve** | ✅ Simple | ⚠️ Moderate |
 
 **Use BalrogNPC if:** You primarily write rAthena scripts  
 **Use Notepad++ if:** You need multi-file editing
@@ -246,11 +246,11 @@ See [Troubleshooting](TROUBLESHOOTING.md) for solutions.
 
 | Feature | BalrogNPC | VS Code |
 |---------|-----------|---------|
-| **rAthena Tools** | ? Built-in | ?? Via extensions |
-| **Size** | ? Lightweight | ?? Heavy (~200MB) |
-| **Simplicity** | ? Very simple | ?? Complex |
-| **Features** | ?? Basic | ? Advanced |
-| **Extensions** | ? No | ? Thousands |
+| **rAthena Tools** | ✅ Built-in | ⚠️ Via extensions |
+| **Size** | ✅ Lightweight | ⚠️ Heavy (~200MB) |
+| **Simplicity** | ✅ Very simple | ⚠️ Complex |
+| **Features** | ⚠️ Basic | ✅ Advanced |
+| **Extensions** | ❌ No | ✅ Thousands |
 
 **Use BalrogNPC if:** You want simplicity and rAthena focus  
 **Use VS Code if:** You need advanced IDE features
@@ -269,7 +269,7 @@ Yes! It's open source (MIT License). Fork and modify as needed.
 
 ### How do I report bugs?
 
-Create an issue on [GitHub](https://github.com/balrogbob/BalrogNPC/issues) with:
+Create an issue on GitHub Issues (see repository) with:
 - OS and Python version
 - Steps to reproduce
 - Error messages
@@ -293,13 +293,13 @@ Potentially! Feature requests welcome on GitHub Issues.
 
 **Quick NPC Creation:**
 1. `Ctrl+N` - New file
-2. **rAthena Tools ? Insert Quick NPC**
+2. **rAthena Tools → Insert Quick NPC**
 3. Customize and insert
 4. `Ctrl+S` - Save
 
 **Validate Before Use:**
 1. Write script
-2. **rAthena Tools ? Validate Script**
+2. **rAthena Tools → Validate Script**
 3. Fix issues
 4. Save and deploy
 
@@ -319,7 +319,7 @@ Ctrl+G  Go To Line
 Ctrl+Z  Undo (saves you!)
 ```
 
-**[Full Shortcuts List ?](KEYBOARD_SHORTCUTS.md)**
+**[Full Shortcuts List →](KEYBOARD_SHORTCUTS.md)**
 
 ---
 
@@ -343,4 +343,4 @@ Ctrl+Z  Undo (saves you!)
 
 ---
 
-**Question not answered?** [Ask on GitHub Issues](https://github.com/balrogbob/BalrogNPC/issues) or check [Troubleshooting](TROUBLESHOOTING.md)!
+**Question not answered?** Ask on GitHub Issues (see repository) or check [Troubleshooting](TROUBLESHOOTING.md)!

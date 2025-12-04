@@ -1,23 +1,23 @@
-# BalrogNPC Documentation
+﻿# BalrogNPC Documentation
 
 **Welcome to the complete documentation for BalrogNPC!**
 
 ---
 
-## ?? Start Here
+## 📖 Start Here
 
 ### New to BalrogNPC?
-?? **[Getting Started Guide](GETTING_STARTED.md)** - Quick installation and first steps
+👉 **[Getting Started Guide](GETTING_STARTED.md)** - Quick installation and first steps
 
 ### Looking for something specific?
-?? **[Documentation Index](INDEX.md)** - Complete navigation and search
+👉 **[Documentation Index](INDEX.md)** - Complete navigation and search
 
 ### Want to learn rAthena scripting?
-?? **[rAthena Script Guide](RATHENA_SCRIPT_GUIDE.md)** - 9-chapter comprehensive guide
+👉 **[rAthena Script Guide](RATHENA_SCRIPT_GUIDE.md)** - 9-chapter comprehensive guide
 
 ---
 
-## ?? Documentation Files
+## 📚 Documentation Files
 
 ### Getting Started
 - **[Getting Started](GETTING_STARTED.md)** - Installation, first launch, your first NPC (30 min)
@@ -39,7 +39,7 @@
 
 ---
 
-## ?? Quick Links by Task
+## 🎯 Quick Links by Task
 
 | I want to... | Go to... |
 |-------------|----------|
@@ -55,7 +55,7 @@
 
 ---
 
-## ?? Documentation Stats
+## 📊 Documentation Stats
 
 - **Total Files:** 10
 - **Total Size:** ~92 KB
@@ -66,7 +66,7 @@
 
 ---
 
-## ??? Learning Paths
+## 🗺️ Learning Paths
 
 ### Beginner (2-3 hours)
 1. [Getting Started](GETTING_STARTED.md)
@@ -88,7 +88,7 @@
 
 ---
 
-## ?? Search Tips
+## 🔍 Search Tips
 
 1. **Use the Index** - [INDEX.md](INDEX.md) has comprehensive navigation
 2. **Use browser search** - Ctrl+F in GitHub viewer
@@ -97,18 +97,18 @@
 
 ---
 
-## ?? Documentation Format
+## 📝 Documentation Format
 
 All documentation is in **Markdown (.md)** format and can be:
-- ? Viewed in any text editor
-- ? Rendered in GitHub/GitLab
-- ? Opened in VS Code with preview
-- ? Converted to PDF or HTML
-- ? Searched with text tools
+- ✅ Viewed in any text editor
+- ✅ Rendered in GitHub/GitLab
+- ✅ Opened in VS Code with preview
+- ✅ Converted to PDF or HTML
+- ✅ Searched with text tools
 
 ---
 
-## ?? Need Help?
+## 🆘 Need Help?
 
 1. **Check the Index** - [INDEX.md](INDEX.md)
 2. **Check the FAQ** - [FAQ.md](FAQ.md)
@@ -118,35 +118,35 @@ All documentation is in **Markdown (.md)** format and can be:
 
 ---
 
-## ?? File List
+## 📂 File List
 
 ```
 docs/
-??? README.md                    ? You are here
-??? INDEX.md                     ? Complete navigation
-??? GETTING_STARTED.md           ? Installation & first steps
-??? USER_GUIDE.md                ? Complete feature guide
-??? KEYBOARD_SHORTCUTS.md        ? Shortcuts reference
-??? QUICK_REFERENCE.md           ? Command reference
-??? RATHENA_SCRIPT_GUIDE.md      ? 9-chapter scripting guide
-??? SCRIPT_EXAMPLES.md           ? Working code examples
-??? TROUBLESHOOTING.md           ? Common issues
-??? FAQ.md                       ? Questions & answers
-??? DOCUMENTATION_SUMMARY.md     ? Documentation overview
+├── README.md                    ← You are here
+├── INDEX.md                     ← Complete navigation
+├── GETTING_STARTED.md           ← Installation & first steps
+├── USER_GUIDE.md                ← Complete feature guide
+├── KEYBOARD_SHORTCUTS.md        ← Shortcuts reference
+├── QUICK_REFERENCE.md           ← Command reference
+├── RATHENA_SCRIPT_GUIDE.md      ← 9-chapter scripting guide
+├── SCRIPT_EXAMPLES.md           ← Working code examples
+├── TROUBLESHOOTING.md           ← Common issues
+├── FAQ.md                       ← Questions & answers
+└── DOCUMENTATION_SUMMARY.md     ← Documentation overview
 ```
 
 ---
 
-## ?? Get Started Now!
+## 🚀 Get Started Now!
 
-**First time?** ? [Getting Started Guide](GETTING_STARTED.md)
+**First time?** → [Getting Started Guide](GETTING_STARTED.md)
 
-**Ready to create?** ? [Script Examples](SCRIPT_EXAMPLES.md)
+**Ready to create?** → [Script Examples](SCRIPT_EXAMPLES.md)
 
-**Want to learn?** ? [rAthena Script Guide](RATHENA_SCRIPT_GUIDE.md)
+**Want to learn?** → [rAthena Script Guide](RATHENA_SCRIPT_GUIDE.md)
 
-**Need help?** ? [Index](INDEX.md) | [FAQ](FAQ.md) | [Troubleshooting](TROUBLESHOOTING.md)
+**Need help?** → [Index](INDEX.md) | [FAQ](FAQ.md) | [Troubleshooting](TROUBLESHOOTING.md)
 
 ---
 
-**Happy scripting with BalrogNPC!** ???
+**Happy scripting with BalrogNPC!** 🐉✨

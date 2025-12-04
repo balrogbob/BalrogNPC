@@ -1,4 +1,4 @@
-# BalrogNPC Keyboard Shortcuts
+﻿# BalrogNPC Keyboard Shortcuts
 
 **Complete reference of all keyboard shortcuts**
 
@@ -39,9 +39,18 @@
 
 ---
 
+## Help & Documentation
+
+| Shortcut | Action | Description |
+|----------|--------|-------------|
+| `F1` | View Documentation | Open built-in documentation viewer |
+
+---
+
 ## Must-Know Shortcuts
 
 ```
+F1      View Documentation
 Ctrl+N  New file
 Ctrl+O  Open file
 Ctrl+S  Save file
@@ -56,4 +65,4 @@ Ctrl+V  Paste
 
 ---
 
-**Master these shortcuts for maximum productivity!** ???
+**Master these shortcuts for maximum productivity!** ⌨️✨

@@ -21,6 +21,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="docs\DOCUMENTATION_SUMMARY.md" />
+    <Content Include="docs\DOCUMENTATION_VIEWER.md" />
     <Content Include="docs\FAQ.md" />
     <Content Include="docs\GETTING_STARTED.md" />
     <Content Include="docs\INDEX.md" />
@@ -28,6 +29,7 @@
     <Content Include="docs\README.md" />
     <Content Include="docs\SCRIPT_EXAMPLES.md" />
     <Content Include="docs\TROUBLESHOOTING.md" />
+    <Content Include="IMPLEMENTATION_SUMMARY.md" />
     <Content Include="LICENSE.txt" />
     <Content Include="PROJECT_SUMMARY.md" />
     <Content Include="README.md" />
@@ -41,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BalrogNPC.py" />
+    <Compile Include="markdown_viewer.py" />
     <Compile Include="rathena-tools\examples.py" />
     <Compile Include="rathena-tools\lib\__init__.py" />
     <Compile Include="rathena-tools\rathena_script_gen.py" />
@@ -49,8 +52,10 @@
     <Compile Include="rathena-tools\__init__.py" />
     <Compile Include="rathena_tools_menu.py" />
     <Compile Include="syntax_highlighter.py" />
+    <Compile Include="test_viewer.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="docs\" />
     <Folder Include="rathena-tools" />
     <Folder Include="rathena-tools\lib" />
     <Folder Include="syntax\" />

@@ -159,6 +159,8 @@ class BalrogNPC:
         # Help menu
         helpMenu = Menu(self.menuBar, tearoff=False)
         self.menuBar.add_cascade(label="Help", menu=helpMenu)
+        helpMenu.add_command(label="View Documentation", command=self.show_documentation, accelerator="F1")
+        helpMenu.add_separator()
         helpMenu.add_command(label="About BalrogNPC", command=self.show_about)
         
         # Create text widget with scrollbar
@@ -218,6 +220,7 @@ class BalrogNPC:
         self.root.bind('<Control-a>', lambda e: self.select_all())
         self.root.bind('<Control-g>', lambda e: self.goto_line_dialog())
         self.root.bind('<Control-f>', lambda e: self.find_replace_dialog())
+        self.root.bind('<F1>', lambda e: self.show_documentation())
         
         # Bind window close
         self.root.protocol("WM_DELETE_WINDOW", self.exit_app)
@@ -1250,6 +1253,14 @@ Based on Windows XP Notepad with rAthena Tools menu.
 © 2025"""
         
         messagebox.showinfo("About BalrogNPC", about_text)
+    
+    def show_documentation(self):
+        """Open the documentation viewer window"""
+        try:
+            from markdown_viewer import open_documentation_viewer
+            open_documentation_viewer(self.root)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to open documentation viewer:\n{str(e)}")
     
     def exit_app(self):
         """Exit application"""
