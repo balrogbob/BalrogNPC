@@ -204,8 +204,16 @@ class MarkdownViewer:
         self.text_widget.tag_config('code_inline', font=('Courier New', 9), background='#f5f5f5', foreground='#c7254e')
         
         # Code blocks
-        self.text_widget.tag_config('code_block', font=('Courier New', 9), background='#f8f8f8', 
-                                   foreground='#333333', lmargin1=20, lmargin2=20, spacing1=5, spacing3=5)
+        self.text_widget.tag_config(
+            'code_block',
+            font=('Courier New', 10),
+            background='#f0f0f0',
+            foreground='#333333',
+            lmargin1=20,
+            lmargin2=20,
+            spacing1=6,
+            spacing3=6
+        )
         
         # Lists
         self.text_widget.tag_config('list', lmargin1=30, lmargin2=30, spacing1=2)
@@ -515,8 +523,11 @@ class MarkdownViewer:
             i += 1
     
     def _insert_code_block(self, code):
-        """Insert a code block."""
-        self.text_widget.insert(END, code + '\n', 'code_block')
+        """Insert code block as normal text (no special rendering)."""
+        # Ensure trailing newline
+        code_text = code if code.endswith('\n') else code + '\n'
+        self.text_widget.insert(END, code_text)
+        # Spacing after block
         self.text_widget.insert(END, '\n')
     
     def _insert_list_item(self, text, indent=0):

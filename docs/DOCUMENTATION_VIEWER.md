@@ -10,12 +10,12 @@ BalrogNPC includes a **built-in documentation viewer** that lets you browse all 
 
 ### Features
 
-✅ **Full Markdown Rendering** - Headers, lists, code blocks, tables  
+✅ **Markdown Rendering** - Headers, lists, tables  
 ✅ **Document Navigation** - Back/Forward buttons, document selector  
 ✅ **Table of Contents** - Sidebar with clickable headings  
 ✅ **Search** - Find text within documents  
 ✅ **Clickable Links** - Jump between documents instantly  
-✅ **Syntax Highlighting** - Code blocks properly formatted  
+⚠️ **No Code Blocks** - Code blocks render as plain text  
 ✅ **Clean Layout** - GitHub-style readable design  
 
 ---
@@ -119,17 +119,7 @@ Rendered with proper font sizes and spacing.
 ```
 
 #### Code Blocks
-```markdown
-```python
-def example():
-    print("Code block")
-```
-```
-
-Rendered with:
-- Monospace font (Courier New)
-- Gray background
-- Proper indentation
+Code blocks are currently not specially rendered in the built-in viewer and will appear as plain text.
 
 #### Lists
 ```markdown
@@ -262,7 +252,7 @@ Default: 900x700 pixels
 The window remembers position during session (within the app run).
 
 ### Text Display
-- **Font:** Arial 10pt (body), Courier New 9pt (code)
+- **Font:** Arial 10pt (body)
 - **Colors:** GitHub-inspired theme
 - **Spacing:** Optimized for readability
 

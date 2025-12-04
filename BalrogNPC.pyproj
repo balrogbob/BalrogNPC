@@ -28,6 +28,7 @@
     <Content Include="docs\FAQ.md" />
     <Content Include="docs\FILE_FORMATS.md" />
     <Content Include="docs\FIND_REPLACE.md" />
+    <Content Include="docs\FORUM_ANNOUNCEMENT.md" />
     <Content Include="docs\FUNCTION_CREATOR.md" />
     <Content Include="docs\GETTING_STARTED.md" />
     <Content Include="docs\INDEX.md" />
