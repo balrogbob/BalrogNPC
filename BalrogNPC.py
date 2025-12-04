@@ -271,7 +271,8 @@ class BalrogNPC:
             # Picker + entry
             fg_frame = ttk.Frame(right)
             fg_frame.pack(pady=(0,6), anchor=W)
-            fg_entry = ttk.Entry(fg_frame, textvariable=fg_var, width=12)
+            # Use classic Entry so we can change fg/bg easily for preview
+            fg_entry = Entry(fg_frame, textvariable=fg_var, width=12)
             fg_entry.pack(side=LEFT)
             ttk.Button(fg_frame, text='Pick...', command=lambda: pick_color(fg_var)).pack(side=LEFT, padx=(6,0))
 
@@ -279,7 +280,7 @@ class BalrogNPC:
             bg_var = StringVar()
             bg_frame = ttk.Frame(right)
             bg_frame.pack(pady=(0,6), anchor=W)
-            bg_entry = ttk.Entry(bg_frame, textvariable=bg_var, width=12)
+            bg_entry = Entry(bg_frame, textvariable=bg_var, width=12)
             bg_entry.pack(side=LEFT)
             ttk.Button(bg_frame, text='Pick...', command=lambda: pick_color(bg_var)).pack(side=LEFT, padx=(6,0))
 
@@ -315,7 +316,40 @@ class BalrogNPC:
                         cur = '#' + cur
                     color = colorchooser.askcolor(color=cur, parent=dlg)
                     if color and color[1]:
-                        var.set(color[1].upper())
+                        val = color[1].upper()
+                        var.set(val)
+                        # update entry preview when picking
+                        try:
+                            if var is fg_var:
+                                set_entry_preview(fg_entry, val)
+                            elif var is bg_var:
+                                set_entry_preview(bg_entry, val)
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+
+            def set_entry_preview(entry_widget, hexcolor):
+                try:
+                    if not hexcolor:
+                        entry_widget.config(foreground='', background='')
+                        return
+                    # ensure starts with #
+                    c = hexcolor.strip()
+                    if not c.startswith('#'):
+                        c = '#' + c
+                    # apply as foreground color for visibility; if color is dark, set text to white
+                    entry_widget.config(background=c)
+                    # compute luminance to choose contrasting text color
+                    try:
+                        r = int(c[1:3], 16)
+                        g = int(c[3:5], 16)
+                        b = int(c[5:7], 16)
+                        lum = (0.299*r + 0.587*g + 0.114*b)
+                        text_col = '#000000' if lum > 186 else '#FFFFFF'
+                        entry_widget.config(foreground=text_col)
+                    except Exception:
+                        entry_widget.config(foreground='#000000')
                 except Exception:
                     pass
 
@@ -335,6 +369,12 @@ class BalrogNPC:
                         bg = p.split('=',1)[1]
                 fg_var.set(fg)
                 bg_var.set(bg)
+                # update entry preview colors
+                try:
+                    set_entry_preview(fg_entry, fg)
+                    set_entry_preview(bg_entry, bg)
+                except Exception:
+                    pass
 
             def save_color():
                 sel = lb.curselection()

@@ -20,6 +20,14 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="docs\DOCUMENTATION_SUMMARY.md" />
+    <Content Include="docs\FAQ.md" />
+    <Content Include="docs\GETTING_STARTED.md" />
+    <Content Include="docs\INDEX.md" />
+    <Content Include="docs\KEYBOARD_SHORTCUTS.md" />
+    <Content Include="docs\README.md" />
+    <Content Include="docs\SCRIPT_EXAMPLES.md" />
+    <Content Include="docs\TROUBLESHOOTING.md" />
     <Content Include="LICENSE.txt" />
     <Content Include="PROJECT_SUMMARY.md" />
     <Content Include="README.md" />
